@@ -9,6 +9,7 @@ class Data
 		std::string _name;
 
 	public:
+		Data();
 		Data(int id, const std::string& name);
 		Data(const Data &other);
 		int getid() const;

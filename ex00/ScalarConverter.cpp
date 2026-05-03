@@ -1,15 +1,15 @@
 #include "ScalarConverter.hpp"
+#include <cfloat>
 #include <climits>
 #include <cstdlib>
+#include <cctype>
 #include <cmath>
 #include <iomanip>
 
 
 enum e_type {
     CHAR,
-    INT,
-    FLOAT,
-    DOUBLE,
+    OTHER,
     SPECIAL,    // Pour les nan, inf, etc.
     IMPOSSIBLE  // Si la chaîne est invalide (ex: "42.5.5f" ou "bonjour")
 };
@@ -52,10 +52,10 @@ int what_type(const std::string& arg)
     if (points > 1 || fs > 1 || (fs == 1 && arg[arg.length() - 1] != 'f'))
         return IMPOSSIBLE;
     if (fs == 1)
-        return FLOAT;
+        return OTHER;
     if (points == 1)
-        return DOUBLE;
-    return INT;
+        return OTHER;
+    return OTHER;
 }
 bool has_decimals(double val)
 {
@@ -77,7 +77,7 @@ void printChar(const std::string& value)
 	std::cout.unsetf(std::ios_base::floatfield); // C++98 : Enlève le mode "fixed"
 	std::cout << std::setprecision(6);           // C++98 : Remet la précision par défaut
 }
-
+/*
 void printInt(const std::string& value)
 {
 		char*endptr;
@@ -94,7 +94,10 @@ void printInt(const std::string& value)
 			std::cout << "int: " << static_cast<int>(d_val) << "\n";
 		if(!has_decimals(d_val))
 			std::cout << std::fixed << std::setprecision(1);
-		std::cout << "float: " << static_cast<float>(d_val) << "f\n";
+		if(d_val > FLT_MAX || d_val < FLT_MIN)
+			std::cout << "float: impossible\n";
+		else
+			std::cout << "float: " << static_cast<float>(d_val) << "f\n";
 		std::cout << "double: " << d_val << "\n";
 		std::cout.unsetf(std::ios_base::floatfield); // C++98 : Enlève le mode "fixed"
 		std::cout << std::setprecision(6);  
@@ -115,8 +118,11 @@ void printFloat(const std::string& value)
 	else
 		std::cout << "int: " << static_cast<int>(d_val) << "\n";
 	if(!has_decimals(d_val))
-		std::cout << std::fixed << std::setprecision(1);
-	std::cout << "float: " << static_cast<float>(d_val) << "f\n";
+		std::cout << std::fixed << std::setprecision(1); /// !!!
+	if(d_val > FLT_MAX || d_val < FLT_MIN)
+		std::cout << "float: impossible\n";
+	else
+		std::cout << "float: " << static_cast<float>(d_val) << "f\n";
 	std::cout << "double: " << d_val << "\n";
 	std::cout.unsetf(std::ios_base::floatfield); // C++98 : Enlève le mode "fixed"
 	std::cout << std::setprecision(6); 
@@ -138,12 +144,40 @@ void printDouble(const std::string& value)
 		std::cout << "int: " << static_cast<int>(d_val) << "\n";
 	if(!has_decimals(d_val))
 		std::cout << std::fixed << std::setprecision(1);
-	std::cout << "float: " << static_cast<float>(d_val) << "f\n";
+	if(d_val > FLT_MAX || d_val < FLT_MIN)
+		std::cout << "float: impossible\n";
+	else
+		std::cout << "float: " << static_cast<float>(d_val) << "f\n";
 	std::cout << "double: " << d_val << "\n";
 	std::cout.unsetf(std::ios_base::floatfield);
 	std::cout << std::setprecision(6);
 }
+*/
 
+void printOther(const std::string& value)
+{
+	char *endptr;
+	double d_val = std::strtod(value.c_str(), &endptr);
+	if (d_val < 0 || d_val > 127)
+		std::cout << "char: impossible\n";
+	else if (!isprint(static_cast<int>(d_val)))
+		std::cout << "char: Non displayable\n";
+	else
+		std::cout << "char: '" << static_cast<char>(d_val) << "'\n";
+	if(d_val > INT_MAX || d_val < INT_MIN)
+		std::cout << "int: impossible\n";	//problem !!!!!
+	else
+		std::cout << "int: " << static_cast<int>(d_val) << "\n";
+	if(!has_decimals(d_val))
+		std::cout << std::fixed << std::setprecision(1);
+	if(d_val > FLT_MAX || d_val < -FLT_MAX)
+		std::cout << "float: impossible\n";
+	else
+		std::cout << "float: " << static_cast<float>(d_val) << "f\n";
+	std::cout << "double: " << d_val << "\n";
+	std::cout.unsetf(std::ios_base::floatfield);
+	std::cout << std::setprecision(6);
+}
 void ScalarConverter::convert(const std::string& value)
 {
 	int type = what_type(value);
@@ -164,12 +198,10 @@ void ScalarConverter::convert(const std::string& value)
             std::cout << "float: -inff\ndouble: -inf\n";
         return;
     }
-    t_conv_func funcs[4] = 
+    t_conv_func funcs[2] = 
     {
         &printChar,
-        &printInt,
-        &printFloat,
-        &printDouble
+        &printOther
     };
     funcs[type](value);
 }

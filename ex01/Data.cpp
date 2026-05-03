@@ -1,6 +1,11 @@
 #include "Data.hpp"
 #include "Serializer.hpp"
 #include <iostream>
+
+Data::Data() : _id(0), _name("default")
+{
+	std::cout << "Data created with: id " << _id << " name: " << _name << " by default constructor\n\n";
+}
 Data::Data(int id, const std::string& name) : _id(id), _name(name)
 {
 	std::cout << "Data created with: id: " << _id << " name: " << _name << "\n\n";

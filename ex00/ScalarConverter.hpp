@@ -14,16 +14,12 @@ class ScalarConverter
 		ScalarConverter(const ScalarConverter &other);
 
 		ScalarConverter &operator=(const ScalarConverter &other);
-
+		
 		~ScalarConverter();
 		
 	public:
 
 		static void convert(const std::string& value);
 };
-
-void printFloat(const std::string& value);
-void printDouble(const std::string& value);
-
 
 #endif

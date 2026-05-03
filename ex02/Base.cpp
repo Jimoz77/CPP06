@@ -2,7 +2,9 @@
 #include <cstdlib>
 
 #include <ctime>     // Pour time()
+#include <exception>
 #include <iostream>  // Pour afficher ce qu'on a généré (très utile pour débugger)
+#include <exception>
 
 
 Base* generate(void)
@@ -40,7 +42,7 @@ void identify(Base* p)
 	else if(dynamic_cast<C*>(p) != NULL)
 		std::cout << "C\n";
 	else
-		std::cout << "Erorr\n";
+		std::cout << "Error\n";
 }
 
 void identify(Base& p)
@@ -50,30 +52,27 @@ void identify(Base& p)
 	{
 		(void)dynamic_cast<A&>(p);
 		std::cout << "A\n";
-		//return;
+		return;
+	}
+	catch (const std::exception &e) {}
+	try
+	{
+		(void)dynamic_cast<B&>(p);
+		std::cout << "B\n";
+		return;
+	}
+	catch (const std::exception &e) {}
+	try
+	{
+		(void)dynamic_cast<C&>(p);
+		std::cout << "C\n";
+		return;
 	}
 	catch (const std::exception &e)
 	{
-		try
-			{
-				(void)dynamic_cast<B&>(p);
-				std::cout << "B\n";
-				//return;
-			}
-			catch (const std::exception &e)
-			{
-				try
-				{
-					(void)dynamic_cast<C&>(p);
-					std::cout << "C\n";
-					//return;
-				}
-				catch (const std::exception &e)
-				{
-					std::cout << "Erorr\n";
-				}
-			}	
 	}
+	std::cout << "Error\n";
+
 }
 
 Base::~Base()
